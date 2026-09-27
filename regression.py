@@ -26,8 +26,6 @@ class NormalRegression:
     @staticmethod
     def normalRegression(dataset: NDArray):
         average: float = np.mean(dataset)
-        dataset -= average
-        dataset = np.abs(dataset)
-        mean_deviation: float = np.mean(dataset)
+        mean_deviation: float = np.mean(np.abs(dataset- average))
 
         return NormalDistrubution(average, CONVERSION_COSTANT * mean_deviation)
