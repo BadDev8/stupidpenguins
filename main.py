@@ -1,5 +1,4 @@
 import pandas as pd
-from pandas.core.frame import DataFrame
 
 from regression import NormalDistrubution, normalRegression
 
@@ -67,7 +66,7 @@ def save_values() -> None:
 
 
 def main():
-    processed_data: tuple[DataFrame, list[list[NormalDistrubution]], list[float]] = read_data()
+    processed_data: tuple[pd.DataFrame, list[list[NormalDistrubution]], list[float]] = read_data()
 
     test_df: pd.DataFrame = processed_data[0]
     distributions: list[list[NormalDistrubution]] = processed_data[1]
