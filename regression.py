@@ -13,19 +13,16 @@ class NormalDistrubution:
         self.average = average
         self.StdDev = StdDev
         self.max_value = ONEOVERSQRTTWOPI / StdDev
-        self.exponent_coefficient = -1/(2 * StdDev**2)
-    
-    def _exponent(self, x:float):
-        return self.exponent_coefficient * (x-self.average)**2
+        self.exponent_coefficient = -1 / (2 * StdDev**2)
 
-    def value(self, x):
-        return self.max_value * pow(e, (self._exponent(x))
+    def _exponent(self, x: float) -> float:
+        return self.exponent_coefficient * (x - self.average) ** 2
+
+    def value(self, x) -> float:
+        return self.max_value * pow(e, (self._exponent(x)))
 
 
-class NormalRegression:
-    @staticmethod
-    def normalRegression(dataset: NDArray):
-        average: float = np.mean(dataset)
-        mean_deviation: float = np.mean(np.abs(dataset- average))
-
-        return NormalDistrubution(average, CONVERSION_COSTANT * mean_deviation)
+def normalRegression(dataset: NDArray) -> NormalDistrubution:
+    average: float = np.mean(dataset)
+    mean_deviation: float = np.mean(np.abs(dataset - average))
+    return NormalDistrubution(average, CONVERSION_COSTANT * mean_deviation)
