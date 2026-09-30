@@ -9,11 +9,11 @@ ONEOVERSQRTTWOPI = 1 / sqrt(2 * pi)
 
 
 class NormalDistrubution:
-    def __init__(self, average, StdDev):
-        self.average = average
-        self.StdDev = StdDev
-        self.max_value = ONEOVERSQRTTWOPI / StdDev
-        self.exponent_coefficient = -1 / (2 * StdDev**2)
+    def __init__(self, average: float, StdDev: float):
+        self.average: float = average
+        self.StdDev: float = StdDev
+        self.max_value: float = ONEOVERSQRTTWOPI / StdDev
+        self.exponent_coefficient: float = -1 / (2 * StdDev**2)
 
     def _exponent(self, x: float) -> float:
         return self.exponent_coefficient * (x - self.average) ** 2

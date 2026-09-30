@@ -1,4 +1,6 @@
+import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 
 from regression import NormalDistrubution, normalRegression
 
@@ -53,16 +55,39 @@ def classify(data: pd.Series, distributions: list[list[NormalDistrubution]], fre
     return species[max_index]
 
 
-def save_values() -> None:
-    """
-    Not implemented yet and probably never will
+def save_singular_figure(count: int, i: int, j: int, distribution: NormalDistrubution) -> None:
+    plt.figure(count)
+    x = np.linspace(distribution.average - 2.5 * distribution.StdDev, distribution.average + 2.5 * distribution.StdDev, 1000)
+    plt.plot(x, distribution.value(x), label=(species[i] + " - " + columns[j]))
+    plt.xlabel(columns[j])
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(f"out/by_specie-trait/{species[i] + ' - ' + columns[j]}")
 
-    it should compile and save the classify function to create a runnable without needing to approzimate every time the gaussian
 
-    however this is useless for both learning (it is relatively simple) and speed, since the takes less than a second on my pc to
-    classify all penguins in the dataset given the low amount of data provided
-    """
-    return
+def save_trait_figure(count: int, trait: int, distributions: list[NormalDistrubution]) -> None:
+    plt.figure(count)
+    max_std: float = max([distr.StdDev for distr in distributions])
+    means: list[float] = [distribution.average for distribution in distributions]
+    x = np.linspace(min(means) - 2.5 * max_std, max(means) + 2.5 * max_std, 3000)
+    for i in range(len(species)):
+        plt.plot(x, distributions[i].value(x), label=(species[i] + " - " + columns[trait]))
+    plt.xlabel(columns[trait])
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(f"out/by_trait/{columns[trait]}")
+
+
+def save_output(distributions: list[list[NormalDistrubution]]) -> None:
+    count: int = 0
+    for i in range(len(distributions)):
+        for j in range(len(distributions[i])):
+            save_singular_figure(count, i, j, distributions[i][j])
+            count += 1
+
+    for i in range(len(columns)):
+        save_trait_figure(count, i, [list[i] for list in distributions])
+        count += 1
 
 
 def main():
@@ -73,13 +98,15 @@ def main():
     frequencies: list[float] = processed_data[2]
     COUNT: int = len(test_df)
     guessed: int = 0
-
+    print("Started training: ...")
     for i in range(COUNT):
         penguin: pd.Series = test_df.iloc[i]
         if penguin["species"] == classify(penguin, distributions, frequencies):
             guessed += 1
-
-    print(f"We had an accuracy of {guessed / COUNT}")
+    print(f"Total test penguins: {COUNT} \n We had an accuracy of {guessed / COUNT}")
+    print("Saving files: ...")
+    save_output(distributions)
+    _ = input("Press to exit")
 
 
 if __name__ == "__main__":
