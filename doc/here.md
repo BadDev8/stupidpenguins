@@ -42,7 +42,7 @@ Undertsanding how we find that requires some decent knowledge of calculus, so I'
 We are going to focus on only one of the variables, since we can repeat the same process for the others.<br>
 We start by removing that "given Adelie" (or the other specie we are considering) by just ... using only the samples from Adelie penguins.
 
-The normal distribution we have assumed the value follows is univocally defined by two values $\overline{x}, \sigma$ which represent the mean and the standard deviation as the function:
+The normal distribution we have assumed the value follows is univocally defined by two values $\overline{x}, \sigma$ (which represent the mean and the standard deviation) as the function:
 $$f(x) = \frac{1}{\sigma \sqrt{2\pi}} \ \ e^{- \frac{(x-\overline{x})^2}{2\sigma^2}}$$
 
 notice that those values are ideal, we can't have them. But we can have a good estimation of them through the mean and the standard deviation of the data we have.
