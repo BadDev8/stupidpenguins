@@ -6,7 +6,7 @@ Notice that we assume all values follow a normal / gaussian distribution.
 This is not necessarily true, but it is "precise enough" for the classifier to get 97% (or more) precision.
 
 The classifier itself is, in fact, really simple. <br>
-It's called **Naive Bayesian classifier** is based on the bayes formula:
+It's called **Naive Bayesian classifier** and it's based on the bayes formula:
 
 $$ P(A|B) = \frac{P(B|A) P(A)}{P(B)} $$
 
