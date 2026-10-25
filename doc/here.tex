@@ -1,0 +1,304 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{libertinus}
+
+\usepackage{fontawesome5}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+
+\usepackage{hyperref}
+\hypersetup{ colorlinks=true,linkcolor=blue,urlcolor=cyan }
+
+\input{mymath.sty}
+
+\usepackage{bm}
+
+\newenvironment{tightcenter}{%
+    \setlength\topsep{0pt}
+    \setlength\parskip{0pt}
+    \begin{center}
+}{%
+    \end{center}
+}
+
+\title{Stupid penduings}
+\author{BadDev8}
+
+\begin{document}
+\maketitle
+
+\section*{Introduction}
+
+This doc will brefly explain what the algorithm used in this project is and how
+it works.
+
+\section*{Basics}
+
+\begin{warning}
+    Notice that we assume all values follow a normal / gaussian distribution.
+
+    This is not necessarily true, but it is "precise enough" for the classifier
+    to get 97\% (or more) precision.
+\end{warning}
+
+The classifier itself is, in fact, really simple. \\
+It's called \textbf{Naive Bayesian classifier} (or NBC) and it's based on the
+bayes formula:
+
+\begin{proposition}
+    {Bayes formula}{} Given two possible events A and B, it holds:
+    \[
+        P(A|B) = \frac{P(B|A) P(A)}{P(B)}
+    \]
+    where $P(A|B)$ is the probability of the event A given that event B holds.
+\end{proposition}
+
+In the training, the classifier is given examples of instances, each one with a
+label corresponding to his class. So, when it has to classify a new instance,
+the classifier calculates the probability of the instance to be in every class,
+and chooses the class with the heighest probability.
+
+In this specific dataset our instances are penguins and our classes are species.
+This means that the NBC wants to calculate the probabilities:
+
+\[
+    P(Specie|x_1,x_2, \dots \ , x_n) = \frac{P(x_1,x_2, \dots \ , x_n|Specie) P(Specie)}{P(x_1,x_2, \dots \ , x_n)}
+\]
+
+\begin{tightcenter}
+    where $x_1,x_2, \dots , x_n$ are some data of a specific penguin (bill
+    lenght, flipper lenght, \dots)
+\end{tightcenter}
+for each specie (Adelie, Chinstrap, Gentoo), then compare them and choose the
+specie with the higher probability. \\
+\\
+Notice that $P(x_1,x_2, \dots \ , x_n)$ doesn't really need to be evaluated,
+since dividing two number for the same positive value does not change their
+order. So we can just ignore it and get the faster:
+\[
+    P(x_1,x_2, \dots \ , x_n|Adelie) P(Adelie)
+\]
+
+Let's look to the specific components of this formula:
+\begin{itemize}
+    \item $P(Adelie)$ is really easy to get, since it is the same as the
+          frequency of the specie divided by the number of total samples.
+    \item $P(x_1,x_2, \dots \ , x_n|Adelie)$ is tougher and needs a chapter for
+          itself.
+\end{itemize}
+
+\section*{How do we calculate that?}
+
+$P(x_1,x_2, \dots , x_n|Adelie)$ is a distribution on n variables. Notice that
+there are ways to calculate this type of distribution and the classifiers who do
+that are called \textbf{Bayes Optimal Classifier}. \\
+They reach the best accuracy
+(\href{https://en.wikipedia.org/wiki/Bayes_classifier}{literally}) but can be
+incredibly expensive from the computational point of view.
+
+This is why we often assume that the single variables are independent between
+them. This is not necessarily true and can lead to errors, but at the same time
+it's ridicoluosly good to make computation faster.
+
+Assuming independencies, we can then rewrite the formula as:
+
+\[
+    P(x_1,x_2, \dots \ , x_n|Adelie) = P(x_1|Adelie) \cdot P(x_2|Adelie) \cdot \dots \cdot P(x_n|Adelie)
+\]
+
+which are probabilities on mono-variable normal distributions.
+
+This can be calculated easily knowing the distributions itself. The process to
+get this type of distributions is easy, but understanding it requires some
+decent calculus knowledge, which can be explored in the Appendix.
+
+I'm going to describe the process on only one of the variables, since we can
+repeat the same process for the others.\\
+We start by removing that "given Adelie" (or the other specie we are
+considering) by just \dots using only the samples from Adelie penguins!
+
+We need to use this important lemma:
+\begin{lemma}{}{}
+    A normal distribution on one varible is univocally defined by two values
+    $\overline{x}, \sigma$ (which represent the mean and the standard deviation)
+    as the function:
+    \[
+        f(x) = \frac{1}{\sigma \sqrt{2\pi}} \ \ e^{- \frac{(x-\overline{x})^2}{2\sigma^2}}
+    \]
+\end{lemma}
+
+notice that those values are ideal, we can't have them. But we can have a good
+estimation of them through the mean and the standard deviation of the data we
+have.
+
+Usually to slightly improve performance we use another fact about the average
+error from the mean (MEA):
+\begin{proposition}{}{}
+    In a gaussain distribution with one varible it holds:
+    \[
+        \text{MAE} = \sqrt{\frac{2}{\pi}} \ \sigma
+    \]
+\end{proposition}
+Calculations for the MAE is a bit faster than those fot the standard deviation,
+so this can be used to improve performance.
+
+\section*{Conclusion}
+
+Repeating this process over and over we can have a distribution for every
+element of every pair (specie, variable). We can then calculate the three
+probalities using:
+
+\[
+    P(x_1,x_2, \dots \ , x_n|Adelie) P(Adelie)
+\]
+
+and chose the specie with the higher probability.
+
+\section*{Appendix}
+
+Here are presented demonstations for some facts used in the exposing.
+
+\begin{proposition}{}{}
+    A normal distribution on one varible is univocally defined by two values
+    $\overline{x}, \sigma$ (which represent the mean and the standard deviation)
+    as the function:
+    \[
+        f(x) = \frac{1}{\sigma \sqrt{2\pi}} \ \ e^{- \frac{(x-\overline{x})^2}{2\sigma^2}}
+    \]
+\end{proposition}
+
+\begin{proof}
+    The normal distribution is defined from the function:
+    \[
+        f(x) = \text{A} e^{-\text{h}^2(x-\text{m})^2}
+    \]
+    where
+    \begin{itemize}
+        \item A is the absolute maxsimum of the function
+        \item m is the point where the function has its max value A
+        \item h is a parameter for how "flat" the curve is
+    \end{itemize}
+
+    It has to hold:
+    \[
+        \int_{-\infty}^{\infty} f(x) dx = 1
+    \]
+    from which:
+    \[
+        \int_{-\infty}^{\infty} \text{A} e^{-\text{h}^2(x-\text{m})^2} dx = 1
+    \]
+    changing $h(x - m) = z$
+    \[
+        \text{A} \int_{-\infty}^{\infty} e^{-z^2} dz = \text{h}
+    \]
+    but since we know $\int_{-\infty}^{\infty} e^{-z^2} = \sqrt{\pi}$ it holds:
+    \[
+        \text{A} = \frac{\text{h}}{\sqrt{\pi}}
+    \]
+
+    this means we can rewrite everything into:
+    \[
+        f(x) = \frac{\text{h}}{\sqrt{\pi}} e^{-\text{h}^2(x-\text{m})^2}
+    \]
+
+    Now, the mean $\overline{x}$ is defined in continuos distributions as:
+    \[
+        \overline{x} = \int_{-\infty}^{\infty} x f(x) dx
+    \]
+    from which with the same substitution we get:
+    \[
+        \overline{x} = \frac{\text{h}}{\sqrt{\pi}} \int_{-\infty}^{\infty} x e^{-\text{h}^2(x-\text{m})^2} dx
+    \]
+    \[
+        \overline{x} = \frac{}{\sqrt{\pi}} \int_{-\infty}^{\infty} (\frac{z}{\text{h}} + \text{m}) e^{-z^2} dz
+    \]
+    the first term of the integral is 0 since it's an odd function, it remains:
+    \[
+        \overline{x} = \frac{1}{\sqrt{\pi}} \int_{-\infty}^{\infty} \text{m} e^{-z^2} dz
+                     = \frac{1}{\sqrt{\pi}} \ \text{m} \ \sqrt{\pi}
+                     = m
+    \]
+
+    In a similar way we can get the Square error $\sigma^2$:
+    \[
+        \sigma^2 = \int_{-\infty}^{\infty} (x - \overline{x})^2 f(x) dx
+    \]
+    \[
+        \sigma^2 = \int_{-\infty}^{\infty} \frac{\text{h}}{\sqrt{\pi}} (x - m)^2 e^{-\text{h}^2(x-\text{m})^2} dx
+    \]
+    \[
+        \sigma^2 = \frac{1}{\sqrt{\pi} \ \text{h}^2} \int_{-\infty}^{\infty} (z)^2 e^{-z^2} dz
+    \]
+    using integration by part we get:
+    \[
+        \int_{-\infty}^{\infty} z^2 e^{-z^2} = \frac{\sqrt{\pi}}{2}
+    \]
+    and:
+    \[
+        \sigma^2
+        =           \frac{1}{\sqrt{\pi} \ \text{h}^2} \ \frac{\sqrt{\pi}}{2}
+        =           \frac{1}{2 \ \text{h}^2}
+        \rightarrow \sigma
+        =           \sqrt{\frac{1}{2 \ \text{h}^2}}
+        =           \frac{1}{\sqrt{2} \ \text{h}}
+    \]
+    \[
+        \text{h} = \frac{1}{\sqrt{2} \sigma}
+    \]
+
+    By substituting into the original equation we found the thesis:
+    \[
+        f(x) = \frac{\text{h}}{\sqrt{\pi}} e^{-\text{h}^2(x-\text{m})^2}
+             = \frac{1}{\sqrt{2 \pi \sigma}} e^{-(x-\overline{x})^2 / 2\sigma^2}
+    \]
+
+\end{proof}
+
+\begin{proposition}{}{}
+    In a gaussain distribution with one varible it holds:
+    \[
+        \text{MAE} = \sqrt{\frac{2}{\pi}} \ \sigma
+    \]
+\end{proposition}
+\begin{proof}
+    By definition:
+    \[
+        \text{MAE}
+        = \int_{-\infty}^{\infty} |x
+          - \text{m}| \frac{\text{h}}{\sqrt{\pi}} e^{-\text{h}^2(x-\text{m})^2} dx
+    \]
+    with $\text{y} = |x - \text{m}|$
+    \[
+        \text{MAE} = \frac{2\text{h}}{\sqrt{\pi}} \int_{0}^{\infty} \text{y} e^{-\text{h}^2 \text{y}^2} dy
+    \]
+    with
+    \[
+        \text{z} = \text{h}^2 \text{y}^2
+    \]
+    \[
+        dz = 2 \text{h}^2 \text{y} \ dy
+    \]
+    \[
+        \text{y} \ dy = \frac{dz}{2 \text{h}^2}
+    \]
+    we get:
+    \[
+        \text{MAE} = \frac{1}{\text{h}\sqrt{\pi}} \int_{0}^{\infty} e^{-\text{z}} dz
+    \]
+    \[
+        \text{MAE} = \frac{1}{\text{h}\sqrt{\pi}}
+    \]
+
+    But from the prevous proposition we know
+    $\text{h} = \frac{1}{\sqrt{2} \sigma}$ so:
+    \[
+        \text{MAE} = \frac{1}{\text{h}\sqrt{\pi}}
+                   = \frac{\sqrt{2} \sigma}{\sqrt{\pi}}
+                   = \sqrt{\frac{2}{\pi}} \ \sigma
+    \]
+
+\end{proof}
+
+\end{document}

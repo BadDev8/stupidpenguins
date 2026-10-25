@@ -1,0 +1,39 @@
+%\RequirePackage{luatex85}
+\ProvidesPackage{mymath}
+
+\RequirePackage{fontawesome5}
+\RequirePackage{xcolor}
+\RequirePackage[most]{tcolorbox}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\tcbset{ thmstyle/.style={
+    enhanced, breakable, colback=#1!5, colframe=#1!65!black, boxrule=0.5pt,
+    arc=2pt, coltitle=white, fonttitle=\bfseries, attach boxed title to top
+    left={yshift=-\tcboxedtitleheight/2, xshift=3mm}, boxed title
+    style={colback=#1!65!black, arc=1pt, boxrule=0pt}, top=4mm, bottom=2mm,
+    before skip=1.4em, after skip=1em,
+} }
+
+\newtcbtheorem[number within=section]{definition}{Definition}%
+{thmstyle=green}{def}
+\newtcbtheorem[use counter from=definition]{lemma}{Lemma}%
+{thmstyle=orange}{lem}
+\newtcbtheorem[use counter from=definition]{proposition}{Proposition}%
+{thmstyle=blue}{prop}
+\newtcbtheorem[use counter from=definition]{theorem}{Theorem}%
+{thmstyle=red}{thm}
+
+\newtcolorbox{important}{
+    enhanced, breakable, frame hidden, borderline west={2.5pt}{0pt}{violet!70},
+    colback=violet!6, colbacktitle=violet!6, coltitle=violet!70!black,
+    fonttitle=\bfseries, title={\faExclamationCircle\ Important}, before
+    skip=1em, after skip=1em,
+}
+\newtcolorbox{warning}{
+    enhanced, breakable, frame hidden, borderline
+    west={2.5pt}{0pt}{orange!70!black}, colback=orange!8, colbacktitle=orange!8,
+    coltitle=orange!60!black, fonttitle=\bfseries,
+    title={\faExclamationTriangle\ Warning}, before skip=1em, after skip=1em,
+}
